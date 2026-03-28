@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MI Planer – Lehrplan 21</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,300;0,400;1,300&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --z1:#D6610A;--z1-bg:#FEF0E3;--z1-mid:#E8821C;--z1-light:#FFF7F0;--z1-border:#F5C49A;
+  --z2:#1A62A0;--z2-bg:#E3EEF9;--z2-mid:#2176AE;--z2-light:#F0F7FF;--z2-border:#9DC4E8;
+  --z3:#4A8A1E;--z3-bg:#EAF3E0;--z3-mid:#5A9B2F;--z3-light:#F3FAF0;--z3-border:#A8D080;
+  --med:#B85C00;--med-bg:#FEF3E8;--med-border:#F5C49A;
+  --inf:#1A5FA0;--inf-bg:#E3EEF9;--inf-border:#9DC4E8;
+  --awk:#5A4EA0;--awk-bg:#EEECF9;--awk-border:#C0B8E8;
+  --bg:#F7F5F0;--white:#FFFFFF;--text:#1A1816;--text-2:#5C5850;--text-3:#A09A92;
+  --border:#E4E0D8;--border-2:#C8C4BC;
+  --r:8px;--r-sm:5px;--r-lg:12px;--r-xl:16px;
+}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6}
+nav{background:var(--white);border-bottom:1px solid var(--border);height:54px;display:flex;align-items:center;padding:0 1.75rem;gap:4px;position:sticky;top:0;z-index:200}
+.brand{font-family:'Source Serif 4',serif;font-size:17px;font-weight:400;margin-right:auto;color:var(--text);letter-spacing:-.01em}
+.brand em{font-style:italic;color:var(--z2)}
+.tab{font-size:13px;font-weight:500;padding:6px 14px;border-radius:20px;cursor:pointer;border:none;background:none;font-family:inherit;color:var(--text-2);transition:all .15s}
+.tab:hover{background:var(--bg)}.tab.on{background:var(--text);color:var(--white)}
+.pg{display:none}.pg.on{display:block}
+.wrap{max-width:1000px;margin:0 auto;padding:2rem 1.75rem}
+
+/* LP */
+.lp-head{margin-bottom:1.5rem}
+.lp-head h1{font-family:'Source Serif 4',serif;font-size:26px;font-weight:300;letter-spacing:-.02em;margin-bottom:.25rem}
+.lp-head p{font-size:13px;color:var(--text-2)}
+.filter-row{display:flex;gap:6px;margin-bottom:1.75rem;flex-wrap:wrap;align-items:center}
+.filter-row span{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);margin-right:4px}
+.fb{font-size:12px;font-weight:500;padding:4px 13px;border-radius:20px;cursor:pointer;border:1.5px solid var(--border);background:var(--white);font-family:inherit;color:var(--text-2);transition:all .15s;line-height:1.4}
+.fb.on-all{background:var(--text);border-color:var(--text);color:var(--white)}
+.fb.on-z1{background:var(--z1-bg);border-color:var(--z1);color:var(--z1)}
+.fb.on-z2{background:var(--z2-bg);border-color:var(--z2);color:var(--z2)}
+.fb.on-z3{background:var(--z3-bg);border-color:var(--z3);color:var(--z3)}
+.bereich{margin-bottom:2.5rem}
+.bereich-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;padding-bottom:10px;border-bottom:1.5px solid var(--border)}
+.bereich-code{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:4px;font-family:monospace}
+.code-med{background:var(--med-bg);color:var(--med);border:1px solid var(--med-border)}
+.code-inf{background:var(--inf-bg);color:var(--inf);border:1px solid var(--inf-border)}
+.code-awk{background:var(--awk-bg);color:var(--awk);border:1px solid var(--awk-border)}
+.bereich-name{font-size:16px;font-weight:600}
+.bereich-hint{font-size:12px;color:var(--text-2);background:var(--z2-bg);border:1px solid var(--z2-border);border-radius:var(--r-sm);padding:6px 12px;margin-bottom:10px;line-height:1.5}
+.k-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kc{background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:border-color .15s}
+.kc:hover{border-color:var(--border-2)}
+.kc-head{padding:.9rem 1rem}
+.kc-meta{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.kc-id{font-size:11px;font-weight:700;font-family:monospace;color:var(--text-3);letter-spacing:.04em}
+.kc-zyklen{display:flex;gap:3px}
+.zd{width:14px;height:14px;border-radius:50%;font-size:8px;font-weight:800;display:flex;align-items:center;justify-content:center;color:white}
+.zd1{background:var(--z1-mid)}.zd2{background:var(--z2-mid)}.zd3{background:var(--z3-mid)}
+.kc-untertitel{font-size:11px;color:var(--text-3);margin-bottom:4px;font-style:italic}
+.kc-kompetenz{font-size:12px;color:var(--text-2);line-height:1.5}
+.kc-toggle{font-size:11px;color:var(--text-3);margin-top:7px}
+.kc-toggle::after{content:' ›'}
+.kc.open .kc-toggle::after{content:' ↓'}
+.kc-detail{display:none;border-top:1px solid var(--border);background:var(--bg)}
+.kc.open .kc-detail{display:block}
+.kc-zyklus-block{padding:.85rem 1rem}
+.kc-zyklus-block+.kc-zyklus-block{border-top:1px solid var(--border)}
+.kz-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px}
+.lz1{color:var(--z1)}.lz2{color:var(--z2)}.lz3{color:var(--z3)}
+.zb1{background:var(--z1-light);border-top:2px solid var(--z1-mid)}
+.zb2{background:var(--z2-light);border-top:2px solid var(--z2-mid)}
+.zb3{background:var(--z3-light);border-top:2px solid var(--z3-mid)}
+.ki-item{display:flex;gap:7px;margin-bottom:6px;font-size:12.5px;line-height:1.55}
+.ki-key{font-weight:700;font-family:monospace;color:var(--text-3);min-width:14px;font-size:11px}
+.ki-ga{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.ga1{background:var(--z1-mid)}.ga2{background:var(--z2-mid)}.ga3{background:var(--z3-mid)}
+.awk-section{margin-bottom:1.25rem}
+.awk-kat{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--awk);margin-bottom:7px;display:flex;align-items:center;gap:6px}
+.awk-kat::before{content:'';width:10px;height:3px;background:var(--awk);border-radius:2px}
+.awk-item{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:.65rem .9rem;margin-bottom:5px;display:flex;gap:9px;align-items:flex-start}
+.awk-zyklen{display:flex;gap:3px;flex-shrink:0;margin-top:2px}
+.awk-text{font-size:12.5px;line-height:1.55;flex:1}
+.awk-ref{font-size:11px;color:var(--text-3);margin-top:2px;font-family:monospace}
+
+/* LEHRMITTEL */
+.lm-head{margin-bottom:1.5rem}
+.lm-head h1{font-family:'Source Serif 4',serif;font-size:26px;font-weight:300;letter-spacing:-.02em;margin-bottom:.25rem}
+.lm-head p{font-size:13px;color:var(--text-2)}
+.lm-layout{display:grid;grid-template-columns:250px 1fr;gap:20px;align-items:start}
+.lm-sidebar{background:var(--white);border:1px solid var(--border);border-radius:var(--r-xl);padding:1.1rem;position:sticky;top:74px}
+.lm-sidebar-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);margin-bottom:10px}
+.lm-bereich-group{margin-bottom:10px}
+.lm-bereich-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:3px 8px;border-radius:4px;margin-bottom:4px}
+.lb-med{color:var(--med);background:var(--med-bg)}
+.lb-inf{color:var(--inf);background:var(--inf-bg)}
+.lm-k-btn{width:100%;text-align:left;padding:5px 8px;border:none;background:none;font-family:inherit;font-size:12px;color:var(--text-2);cursor:pointer;border-radius:var(--r-sm);transition:all .12s;display:flex;align-items:center;justify-content:space-between;gap:6px}
+.lm-k-btn:hover{background:var(--bg);color:var(--text)}
+.lm-k-btn.sel{background:var(--text);color:var(--white)}
+.lm-k-btn.sel .lm-k-count{background:rgba(255,255,255,.2);color:var(--white)}
+.lm-k-id{font-family:monospace;font-size:10px;flex-shrink:0;opacity:.65}
+.lm-k-name{flex:1;line-height:1.3}
+.lm-k-count{font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;background:var(--bg);color:var(--text-3);flex-shrink:0}
+.lm-divider{height:1px;background:var(--border);margin:8px 0}
+
+.lm-result{min-height:300px}
+.lm-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:280px;text-align:center;gap:8px}
+.lm-empty-icon{font-size:28px;opacity:.3}
+.lm-empty p{font-size:13px;color:var(--text-3);max-width:260px;line-height:1.5}
+.lm-result-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem;gap:10px}
+.lm-result-title h2{font-family:'Source Serif 4',serif;font-size:20px;font-weight:300;letter-spacing:-.01em}
+.lm-result-title p{font-size:12px;color:var(--text-2);margin-top:2px}
+.lm-count{font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;background:var(--bg);border:1px solid var(--border);color:var(--text-2);white-space:nowrap;flex-shrink:0;margin-top:3px}
+
+/* Lehrmittel cards */
+.lm-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);margin-bottom:12px;overflow:hidden}
+.lm-card-top{padding:1rem 1.2rem .75rem}
+.lm-card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:6px}
+.lm-card-name{font-size:15px;font-weight:600;line-height:1.3}
+.lm-card-zyklen{display:flex;gap:4px;flex-shrink:0;margin-top:3px}
+.lm-card-desc{font-size:12.5px;color:var(--text-2);line-height:1.55;margin-bottom:8px}
+.lm-card-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.lm-stufe-badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px}
+.badge-z2{background:var(--z2-bg);color:var(--z2);border:1px solid var(--z2-border)}
+.badge-z3{background:var(--z3-bg);color:var(--z3);border:1px solid var(--z3-border)}
+.lm-card-link a{font-size:12px;color:var(--z2);text-decoration:none;border-bottom:1px solid var(--z2-border)}
+.lm-card-link a:hover{color:var(--z2-mid)}
+
+/* Chapter list */
+.lm-chapters{border-top:1px solid var(--border)}
+.lm-ch-group{border-bottom:1px solid var(--border)}
+.lm-ch-group:last-child{border-bottom:none}
+.lm-ch-group-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;padding:6px 1.2rem;background:var(--bg);color:var(--text-3)}
+.lm-ch-item{display:flex;align-items:flex-start;gap:10px;padding:8px 1.2rem;border-top:1px solid var(--border)}
+.lm-ch-item:first-of-type{border-top:none}
+.lm-ch-item.highlight{background:var(--z2-light)}
+.lm-ch-num{font-size:11px;font-weight:700;font-family:monospace;color:var(--text-3);min-width:28px;margin-top:1px;flex-shrink:0}
+.lm-ch-name{font-size:13px;flex:1;line-height:1.4}
+.lm-ch-komps{display:flex;gap:4px;flex-wrap:wrap;flex-shrink:0;margin-top:1px}
+.komp-tag{font-size:10px;font-weight:700;font-family:monospace;padding:1px 6px;border-radius:3px;border:1px solid}
+.kt-med{background:var(--med-bg);color:var(--med);border-color:var(--med-border)}
+.kt-inf{background:var(--inf-bg);color:var(--inf);border-color:var(--inf-border)}
+.kt-sel{background:var(--text);color:var(--white);border-color:var(--text)}
+
+.lm-mode-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem}
+.lm-mode-btn{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:.85rem 1rem;cursor:pointer;font-family:inherit;text-align:left;transition:all .15s;display:flex;flex-direction:column;gap:2px}
+.lm-mode-btn:hover{border-color:var(--border-2)}
+.lm-mode-btn.on{border-color:var(--text);background:var(--text)}
+.lm-mode-btn.on .lm-mode-label{color:var(--white)}
+.lm-mode-btn.on .lm-mode-hint{color:rgba(255,255,255,.55)}
+.lm-mode-btn.on .lm-mode-icon{color:rgba(255,255,255,.7)}
+.lm-mode-icon{font-size:16px;color:var(--text-3);margin-bottom:4px}
+.lm-mode-label{font-size:13px;font-weight:600;color:var(--text);line-height:1.2}
+.lm-mode-hint{font-size:11px;color:var(--text-3);line-height:1.4}
+
+/* Kapitel sidebar (mode B) */
+.lm-book-group{margin-bottom:10px}
+.lm-book-name{font-size:12px;font-weight:700;padding:4px 8px;border-radius:4px;margin-bottom:3px;display:flex;align-items:center;gap:6px}
+.book-z2{background:var(--z2-bg);color:var(--z2)}
+.book-z3{background:var(--z3-bg);color:var(--z3)}
+.lm-book-sub{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);padding:4px 8px 2px;margin-top:5px}
+.lm-ch-btn{width:100%;text-align:left;padding:4px 8px;border:none;background:none;font-family:inherit;font-size:12px;color:var(--text-2);cursor:pointer;border-radius:var(--r-sm);transition:all .12s;display:flex;align-items:center;gap:6px;line-height:1.35}
+.lm-ch-btn:hover{background:var(--bg);color:var(--text)}
+.lm-ch-btn.sel{background:var(--text);color:var(--white)}
+.lm-ch-btn.sel .lm-ch-btn-nr{opacity:.6}
+.lm-ch-btn-nr{font-family:monospace;font-size:10px;flex-shrink:0;opacity:.55;min-width:26px}
+
+/* Kompetenz detail cards (mode B result) */
+.komp-detail-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);margin-bottom:10px;overflow:hidden}
+.kdc-head{padding:.85rem 1rem;display:flex;align-items:flex-start;gap:10px}
+.kdc-badge{font-size:11px;font-weight:700;font-family:monospace;padding:3px 8px;border-radius:4px;flex-shrink:0;margin-top:1px}
+.kdc-body{flex:1}
+.kdc-id{font-size:11px;font-weight:700;font-family:monospace;color:var(--text-3);margin-bottom:2px}
+.kdc-titel{font-size:13.5px;font-weight:600;margin-bottom:3px}
+.kdc-kompetenz{font-size:12px;color:var(--text-2);line-height:1.5}
+.kdc-stufen{border-top:1px solid var(--border)}
+.kdc-stufe{padding:.65rem 1rem;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:flex-start}
+.kdc-stufe:last-child{border-bottom:none}
+.kdc-z-pill{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;flex-shrink:0;margin-top:1px;white-space:nowrap}
+.pill-z2{background:var(--z2-bg);color:var(--z2)}
+.pill-z3{background:var(--z3-bg);color:var(--z3)}
+.kdc-stufe-items{font-size:12px;color:var(--text);line-height:1.55}
+.kdc-item-row{display:flex;gap:6px;margin-bottom:4px}
+.kdc-item-row:last-child{margin-bottom:0}
+.kdc-key{font-weight:700;font-family:monospace;font-size:10px;color:var(--text-3);min-width:12px;margin-top:2px}
+.kdc-ga{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px}
+
+.lm-chapter-title{font-family:'Source Serif 4',serif;font-size:20px;font-weight:300;letter-spacing:-.01em;margin-bottom:3px}
+.lm-chapter-meta{font-size:12px;color:var(--text-2);margin-bottom:1rem}
+.lm-k-count-info{font-size:12px;color:var(--text-3);margin-bottom:.75rem}
+
+@media(max-width:700px){
+  .k-grid{grid-template-columns:1fr}
+  .lm-layout{grid-template-columns:1fr}
+  .lm-sidebar{position:static}
+  .wrap{padding:1.25rem 1rem}
+}
+</style>
+</head>
+<body>
+<nav>
+  <div class="brand">MI<em>Planer</em> &thinsp;·&thinsp; Lehrplan 21</div>
+  <button class="tab on" id="tab-lp" onclick="show('lp')">Lehrplan</button>
+  <button class="tab" id="tab-lm" onclick="show('lm')">Lehrmittel</button>
+</nav>
+
+<div class="pg on" id="pg-lp">
+<div class="wrap">
+  <div class="lp-head">
+    <h1>Medien und Informatik</h1>
+    <p>Modullehrplan Lehrplan 21 · Kanton Thurgau · Kindergarten bis 3. Sekundar</p>
+  </div>
+  <div class="filter-row">
+    <span>Zyklus:</span>
+    <button class="fb on-all" id="f-all" onclick="filter('all')">Alle</button>
+    <button class="fb" id="f-z1" onclick="filter('z1')">Z1 &nbsp;KG–2. Kl.</button>
+    <button class="fb" id="f-z2" onclick="filter('z2')">Z2 &nbsp;3.–6. Kl.</button>
+    <button class="fb" id="f-z3" onclick="filter('z3')">Z3 &nbsp;7.–9. Kl.</button>
+  </div>
+  <div id="lp-content"></div>
+</div>
+</div>
+
+<div class="pg" id="pg-lm">
+<div class="wrap">
+  <div class="lm-head">
+    <h1>Lehrmittel</h1>
+    <p>Wähle eine Richtung und navigiere durch Kompetenzen und Kapitel.</p>
+  </div>
+
+  <!-- Mode toggle -->
+  <div class="lm-mode-row">
+    <button class="lm-mode-btn on" id="mode-a" onclick="setMode('a')">
+      <span class="lm-mode-icon">◈</span>
+      <span class="lm-mode-label">Kompetenz → Kapitel</span>
+      <span class="lm-mode-hint">Welche Kapitel behandeln eine Kompetenz?</span>
+    </button>
+    <button class="lm-mode-btn" id="mode-b" onclick="setMode('b')">
+      <span class="lm-mode-icon">⊞</span>
+      <span class="lm-mode-label">Kapitel → Kompetenzen</span>
+      <span class="lm-mode-hint">Welche Kompetenzen stecken in einem Kapitel?</span>
+    </button>
+  </div>
+
+  <div class="lm-layout">
+    <div class="lm-sidebar" id="lm-sidebar"></div>
+    <div class="lm-result" id="lm-result">
+      <div class="lm-empty">
+        <div class="lm-empty-icon">◈</div>
+        <p id="lm-empty-txt">Wähle links eine Kompetenz, um passende Kapitel zu sehen.</p>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+/* ── LP21 DATA ─────────────────────────────────────────────── */
+const Z={z1:{label:"Zyklus 1 · KG–2. Kl.",short:"Z1",cls:"lz1",bg:"zb1",dot:"zd1",ga:"ga1"},z2:{label:"Zyklus 2 · 3.–6. Kl.",short:"Z2",cls:"lz2",bg:"zb2",dot:"zd2",ga:"ga2"},z3:{label:"Zyklus 3 · 7.–9. Kl.",short:"Z3",cls:"lz3",bg:"zb3",dot:"zd3",ga:"ga3"}};
+const DATA={bereiche:[{id:"MI.1",name:"Medien",code:"code-med",kompetenzen:[{id:"MI.1.1",zyklen:["z1","z2","z3"],untertitel:"Leben in der Mediengesellschaft",kompetenz:"Die SuS können sich in der physischen Umwelt sowie in medialen und virtuellen Lebensräumen orientieren und sich darin entsprechend den Gesetzen, Regeln und Wertesystemen verhalten.",stufen:[{z:"z1",items:[{k:"a",g:true,t:"können sich über Erfahrungen in ihrer unmittelbaren Umwelt, über Medienerfahrungen sowie Erfahrungen in virtuellen Lebensräumen austauschen und über ihre Mediennutzung sprechen (z.B. Naturerlebnis, Spielplatz, Film, Fernsehen, Bilderbuch, Hörspiel, Lernprogramm)."}]},{z:"z2",items:[{k:"b",t:"können Vor- und Nachteile direkter Erfahrungen, durch Medien oder virtuell vermittelter Erfahrungen benennen und die persönliche Mediennutzung begründen."},{k:"c",g:true,t:"können Folgen medialer und virtueller Handlungen erkennen und benennen (z.B. Identitätsbildung, Beziehungspflege, Cybermobbing)."}]},{z:"z3",items:[{k:"d",t:"können Regeln und Wertesysteme verschiedener Lebenswelten unterscheiden, reflektieren und entsprechend handeln (z.B. Netiquette, Werte in virtuellen Welten)."},{k:"e",g:true,t:"können Chancen und Risiken der Mediennutzung benennen und Konsequenzen für das eigene Verhalten ziehen (z.B. Vernetzung, Kommunikation, Cybermobbing, Schuldenfalle, Suchtpotential)."},{k:"f",t:"können Chancen und Risiken der zunehmenden Durchdringung des Alltags durch Medien und Informatik beschreiben (z.B. Globalisierung, Automatisierung, veränderte Berufswelt)."},{k:"g",t:"können Funktion und Bedeutung der Medien für Kultur, Wirtschaft und Politik beschreiben."}]}]},{id:"MI.1.2",zyklen:["z1","z2","z3"],untertitel:"Medien und Medienbeiträge verstehen",kompetenz:"Die SuS können Medien und Medienbeiträge entschlüsseln, reflektieren und nutzen.",stufen:[{z:"z1",items:[{k:"a",t:"verstehen einfache Beiträge in verschiedenen Mediensprachen und können darüber sprechen (Text, Bild, alltägliches Symbol, Ton, Film). Können Werbung erkennen."},{k:"b",t:"können benennen, welche unmittelbaren Emotionen die Mediennutzung auslösen kann (z.B. Freude, Wut, Trauer)."},{k:"c",t:"können mithilfe von vorgegebenen Medien lernen und Informationen zu einem bestimmten Thema beschaffen."}]},{z:"z2",items:[{k:"d",t:"können die Grundfunktionen der Medien benennen (Information, Bildung, Meinungsbildung, Unterhaltung, Kommunikation)."},{k:"e",g:true,t:"können Informationen aus verschiedenen Quellen gezielt beschaffen, auswählen und hinsichtlich Qualität und Nutzen beurteilen."}]},{z:"z3",items:[{k:"f",t:"erkennen, dass Medien und Medienbeiträge auf Individuen unterschiedlich wirken."},{k:"g",g:true,t:"kennen grundlegende Elemente der Bild-, Film- und Fernsehsprache und können ihre Funktion und Bedeutung in einem Medienbeitrag reflektieren."},{k:"h",t:"können die Absicht hinter Medienbeiträgen einschätzen (z.B. Werbung, Zeitschrift, Parteizeitung)."},{k:"i",t:"kennen Organisations- und Finanzierungsformen von Medienangeboten und deren Konsequenzen."}]}]},{id:"MI.1.3",zyklen:["z1","z2","z3"],untertitel:"Medien und Medienbeiträge produzieren",kompetenz:"Die SuS können Gedanken, Meinungen, Erfahrungen und Wissen in Medienbeiträge umsetzen und unter Einbezug der Gesetze, Regeln und Wertesysteme auch veröffentlichen.",stufen:[{z:"z1",items:[{k:"a",g:true,t:"können spielerisch und kreativ mit Medien experimentieren."},{k:"b",t:"können einfache Bild-, Text-, Tondokumente gestalten und präsentieren."}]},{z:"z2",items:[{k:"c",t:"können Medien zum Erstellen und Präsentieren ihrer Arbeiten einsetzen (z.B. Klassenzeitung, Klassenblog, Hörspiel, Videoclip)."},{k:"d",g:true,t:"können in ihren Medienbeiträgen die Sicherheitsregeln im Umgang mit persönlichen Daten einbeziehen."},{k:"e",t:"können Medieninhalte weiterverwenden und unter Angabe der Quelle in Eigenproduktionen integrieren."},{k:"f",t:"können Medien nutzen, um ihre Gedanken und ihr Wissen vor Publikum zu präsentieren und/oder zu veröffentlichen."}]},{z:"z3",items:[{k:"g",g:true,t:"können mit eigenen und fremden Inhalten Medienbeiträge herstellen und berücksichtigen dabei die rechtlichen Rahmenbedingungen sowie Sicherheits- und Verhaltensregeln."},{k:"h",t:"können allein und in Arbeitsteams mit medialen Möglichkeiten experimentieren und sich darüber austauschen."}]}]},{id:"MI.1.4",zyklen:["z1","z2","z3"],untertitel:"Mit Medien kommunizieren und kooperieren",kompetenz:"Die SuS können Medien interaktiv nutzen sowie mit anderen kommunizieren und kooperieren.",stufen:[{z:"z1",items:[{k:"a",t:"können mittels Medien bestehende Kontakte pflegen und sich austauschen (z.B. Telefon, Brief)."}]},{z:"z2",items:[{k:"b",g:true,t:"können Medien für gemeinsames Arbeiten und für Meinungsaustausch einsetzen und dabei die Sicherheitsregeln befolgen."},{k:"c",t:"können mittels Medien kommunizieren und dabei die Sicherheits- und Verhaltensregeln befolgen."}]},{z:"z3",items:[{k:"d",t:"können Medien gezielt für kooperatives Lernen nutzen."},{k:"e",t:"können Medien zur Veröffentlichung eigener Ideen und Meinungen nutzen und das Zielpublikum zu Rückmeldungen motivieren."},{k:"f",g:true,t:"können kooperative Werkzeuge anpassen und für gemeinsames Arbeiten, Meinungsaustausch, Kommunikation sowie zum Publizieren einsetzen (z.B. Blog, Wiki)."}]}]}]},{id:"MI.2",name:"Informatik",code:"code-inf",hinweis:"Der Unterricht im Kompetenzbereich Informatik beginnt im 2. Zyklus erst in der zweiten Hälfte (ab 5. Klasse).",kompetenzen:[{id:"MI.2.1",zyklen:["z1","z2","z3"],untertitel:"Datenstrukturen",kompetenz:"Die SuS können Daten aus ihrer Umwelt darstellen, strukturieren und auswerten.",stufen:[{z:"z1",items:[{k:"a",g:true,t:"können Dinge nach selbst gewählten Eigenschaften ordnen, damit sie ein Objekt mit einer bestimmten Eigenschaft schneller finden (z.B. Farbe, Form, Grösse)."}]},{z:"z2",items:[{k:"b",t:"können unterschiedliche Darstellungsformen für Daten verwenden (z.B. Symbole, Tabellen, Grafiken)."},{k:"c",t:"können Daten mittels selbstentwickelter Geheimschriften verschlüsseln."},{k:"d",t:"kennen analoge und digitale Darstellungen von Daten (Text, Zahl, Bild und Ton) und können die entsprechenden Dateitypen zuordnen."},{k:"e",t:"kennen die Bezeichnungen der von ihnen genutzten Dokumententypen."},{k:"f",t:"erkennen und verwenden Baum- und Netzstrukturen (z.B. Ordnerstruktur auf dem Computer, Stammbaum, Mindmap, Website)."},{k:"g",t:"verstehen die Funktionsweise von fehlererkennenden und -korrigierenden Codes."}]},{z:"z3",items:[{k:"h",t:"können Dokumente so ablegen, dass auch andere sie wieder finden."},{k:"i",t:"können logische Operatoren verwenden (und, oder, nicht)."},{k:"j",g:true,t:"können Daten in einer Datenbank strukturieren, erfassen, suchen und automatisiert auswerten."},{k:"k",t:"können Methoden zur Datenreplikation unterscheiden und anwenden (Backup, Synchronisation, Versionierung)."}]}]},{id:"MI.2.2",zyklen:["z1","z2","z3"],untertitel:"Algorithmen",kompetenz:"Die SuS können einfache Problemstellungen analysieren, mögliche Lösungsverfahren beschreiben und in Programmen umsetzen.",stufen:[{z:"z1",items:[{k:"a",g:true,t:"können formale Anleitungen erkennen und ihnen folgen (z.B. Koch- und Backrezepte, Spiel- und Bastelanleitungen, Tanzchoreographien)."}]},{z:"z2",items:[{k:"b",t:"können durch Probieren Lösungswege für einfache Problemstellungen suchen und auf Korrektheit prüfen."},{k:"c",t:"können Abläufe mit Schleifen und Verzweigungen aus ihrer Umwelt erkennen, beschreiben und strukturiert darstellen (z.B. mittels Flussdiagrammen)."},{k:"d",t:"können einfache Abläufe mit Schleifen, bedingten Anweisungen und Parametern lesen und manuell ausführen."},{k:"e",t:"verstehen, dass ein Computer nur vordefinierte Anweisungen ausführen kann."},{k:"f",g:true,t:"können Programme mit Schleifen, bedingten Anweisungen und Parametern schreiben und testen."}]},{z:"z3",items:[{k:"g",t:"können selbstentdeckte Lösungswege für einfache Probleme in Form von lauffähigen Computerprogrammen formulieren."},{k:"h",g:true,t:"können selbstentwickelte Algorithmen in Form von lauffähigen und korrekten Computerprogrammen mit Variablen und Unterprogrammen formulieren."},{k:"i",t:"können verschiedene Algorithmen zur Lösung desselben Problems vergleichen und beurteilen."}]}]},{id:"MI.2.3",zyklen:["z1","z2","z3"],untertitel:"Informatiksysteme",kompetenz:"Die SuS verstehen Aufbau und Funktionsweise von informationsverarbeitenden Systemen und können Konzepte der sicheren Datenverarbeitung anwenden.",stufen:[{z:"z1",items:[{k:"a",g:true,t:"können Geräte ein- und ausschalten und einfache Funktionen nutzen."},{k:"b",t:"können sich mit eigenem Login in einem lokalen Netzwerk oder einer Lernumgebung anmelden."},{k:"c",t:"können Dokumente selbstständig ablegen und wieder finden."},{k:"d",t:"können mit grundlegenden Elementen der Bedienoberfläche umgehen (Fenster, Menu, mehrere geöffnete Programme)."}]},{z:"z2",items:[{k:"e",t:"können Betriebssystem und Anwendungssoftware unterscheiden."},{k:"f",t:"kennen verschiedene Speicherarten und deren Vor- und Nachteile und verstehen Grösseneinheiten für Daten."},{k:"g",t:"können bei Problemen mit Geräten und Programmen Lösungsstrategien anwenden."},{k:"h",t:"können erklären, wie Daten verloren gehen können und kennen die wichtigsten Massnahmen, sich davor zu schützen."},{k:"i",t:"verstehen die grundsätzliche Funktionsweise von Suchmaschinen."},{k:"j",t:"können lokale Geräte, lokales Netzwerk und das Internet als Speicherorte unterscheiden."},{k:"k",t:"haben eine Vorstellung von den Leistungseinheiten informationsverarbeitender Systeme."}]},{z:"z3",items:[{k:"l",g:true,t:"kennen die wesentlichen Eingabe-, Verarbeitungs- und Ausgabeelemente von Informatiksystemen."},{k:"m",g:true,t:"können das Internet als Infrastruktur von seinen Diensten unterscheiden (z.B. WWW, E-Mail, Internettelefonie, Soziale Netzwerke)."},{k:"n",t:"können die Risiken unverschlüsselter Datenübermittlung und -speicherung abschätzen."}]}]}]}],anwendungskompetenzen:{kategorien:[{name:"Handhabung",items:[{zyklen:["z1"],ref:"MI.2.3.a/b",t:"können Geräte ein- und ausschalten, Programme starten und beenden, einfache Funktionen nutzen, sich mit dem eigenen Login anmelden."},{zyklen:["z1"],ref:"MI.2.3.c",t:"können Dokumente selbstständig ablegen und wieder finden."},{zyklen:["z1","z2"],ref:"MI.2.3.d",t:"können mit grundlegenden Elementen der Bedienoberfläche umgehen (Fenster, Menüs, mehrere geöffnete Programme)."},{zyklen:["z1","z2"],t:"können mit der Tastatur Texte schreiben."},{zyklen:["z3"],t:"können ausreichend automatisiert mit der Tastatur schreiben."},{zyklen:["z3"],ref:"MI.2.1.h",t:"können Dokumente so ablegen, dass auch andere sie wiederfinden."}]},{name:"Recherche und Lernunterstützung",items:[{zyklen:["z1","z2","z3"],ref:"MI.1.2.c",t:"können mit Hilfe von vorgegebenen Medien lernen und Informationen zu einem bestimmten Thema beschaffen."},{zyklen:["z2","z3"],ref:"MI.1.2.e",t:"können Medien und Daten auswählen, auswerten und als Informationsquelle für ihr Lernen nutzen."},{zyklen:["z2","z3"],t:"können Sachtexte im Rahmen einer Recherche beschaffen und die darin enthaltenen Informationen mithilfe von Leitfragen nutzen."},{zyklen:["z3"],t:"können Medien für den eigenen Lernprozess selbstständig auswählen und einsetzen."}]},{name:"Produktion und Präsentation",items:[{zyklen:["z1","z2"],ref:"MI.1.3.b/c",t:"können Medien zum gegenseitigen Austausch sowie zum Erstellen und Präsentieren ihrer Arbeiten einsetzen."},{zyklen:["z2","z3"],t:"können die Grundfunktionen von Geräten und Programmen zur Erstellung, Bearbeitung und Gestaltung von Texten, Tabellen, Präsentationen, Diagrammen, Bildern, Tönen, Videos und Algorithmen anwenden."},{zyklen:["z2","z3"],ref:"MI.1.3.f",t:"können aktuelle Medien nutzen um sich auszutauschen, und um ihre Gedanken und ihr Wissen vor Publikum zu präsentieren oder einer Öffentlichkeit verfügbar zu machen."},{zyklen:["z3"],ref:"MI.2.2.f",t:"können Geräte und Programme zur Erstellung, Bearbeitung und Gestaltung von Texten, Tabellen, Präsentationen, Diagrammen, Bildern, Tönen, Videos und Algorithmen einsetzen."},{zyklen:["z3"],ref:"MI.1.4.f",t:"können Plattformen gestalten und anpassen und diese interaktiv für gemeinsames Arbeiten, Meinungsaustausch, Kommunikation sowie zum Publizieren einsetzen."}]}]}};
+
+/* ── LEHRMITTEL: connected ─────────────────────────────────── */
+const LEHRMITTEL = [
+  {
+    id:"c1", name:"connected 1", stufe:"5. Klasse", zyklen:["z2"],
+    beschreibung:"Lehrmittel Medien und Informatik für die 5. Klasse. Themen: Mediengesellschaft, Internetrecherche, Datenstrukturen, Programmierung, Bildverarbeitung.",
+    verlag:"Lehrmittelverlag Zürich", link:"https://www.lmvz.ch/connected",
+    gruppen:[
+      { label:"Grundangebot", kapitel:[
+        { nr:"Kap. 1", name:"Mitten in der Medienwelt",         komps:["MI.1.1","MI.1.2","MI.1.3"] },
+        { nr:"Kap. 2", name:"Informationen aus dem Internet",   komps:["MI.1.2"] },
+        { nr:"Kap. 3", name:"Informationen auf einen Blick",    komps:["MI.1.3","MI.2.1"] },
+        { nr:"Kap. 4", name:"Vom Alltagscode zum digitalen Code",komps:["MI.2.1","MI.2.3"] },
+        { nr:"Kap. 5", name:"Bilder: Punkt für Punkt",          komps:["MI.2.1","MI.2.2"] },
+      ]},
+      { label:"Wahlangebot", kapitel:[
+        { nr:"+1", name:"Erklärvideos mit Pfiff",               komps:["MI.1.2","MI.1.3","MI.1.4"] },
+        { nr:"+2", name:"Gemeinsam Geschichten schreiben",      komps:["MI.1.2","MI.1.3","MI.1.4"] },
+        { nr:"+3", name:"Kurzschluss und Wackelkontakt",        komps:["MI.2.1","MI.2.2","MI.2.3"] },
+        { nr:"+4", name:"Vom Rohstoff zum Computer",            komps:["MI.1.2"] },
+      ]}
+    ]
+  },
+  {
+    id:"c2", name:"connected 2", stufe:"6. Klasse", zyklen:["z2"],
+    beschreibung:"Lehrmittel Medien und Informatik für die 6. Klasse. Themen: Datendarstellung, Programmieren, Medienproduktion, Datensicherheit.",
+    verlag:"Lehrmittelverlag Zürich", link:"https://www.lmvz.ch/connected",
+    gruppen:[
+      { label:"Grundangebot", kapitel:[
+        { nr:"Kap. 1", name:"Salz und Pfeffer – Bits und Bytes",  komps:["MI.1.2","MI.2.1"] },
+        { nr:"Kap. 2", name:"Das Einmaleins des Programmierens",  komps:["MI.2.2","MI.2.3"] },
+        { nr:"Kap. 3", name:"Wir stylen unsere Rezepte",          komps:["MI.1.3","MI.1.4","MI.2.1"] },
+        { nr:"Kap. 4", name:"@{¥▲→/■¿– alles klar?",             komps:["MI.1.1","MI.1.2","MI.1.4"] },
+        { nr:"Kap. 5", name:"Daten teilen, sichern, nutzen",      komps:["MI.1.1","MI.1.2","MI.2.2","MI.2.3"] },
+      ]},
+      { label:"Wahlangebot", kapitel:[
+        { nr:"+1", name:"Digital Storytelling",                   komps:["MI.1.2","MI.1.3","MI.1.4"] },
+        { nr:"+2", name:"Auf Weltreise im Internet",              komps:["MI.1.2","MI.1.3"] },
+        { nr:"+3", name:"In virtuelle Welten eintauchen",         komps:["MI.1.1","MI.1.2","MI.1.3"] },
+        { nr:"+4", name:"Einparkieren leicht gemacht",            komps:["MI.2.2"] },
+      ]}
+    ]
+  },
+  {
+    id:"c3", name:"connected 3", stufe:"7. Klasse", zyklen:["z3"],
+    beschreibung:"Lehrmittel Medien und Informatik für die 7. Klasse. Themen: Internet, digitale Geräte, Algorithmen, Bildgestaltung, Daten und Datenschutz.",
+    verlag:"Lehrmittelverlag Zürich", link:"https://www.lmvz.ch/connected",
+    gruppen:[
+      { label:"Grundangebot", kapitel:[
+        { nr:"Kap. 1", name:"Eine Entdeckungsreise durch das Internet", komps:["MI.1.1","MI.2.3"] },
+        { nr:"Kap. 2", name:"Digitale Geräte im Alltag",               komps:["MI.1.1","MI.2.3"] },
+        { nr:"Kap. 3", name:"Abheben mit Algorithmen",                  komps:["MI.2.1","MI.2.2"] },
+        { nr:"Kap. 4", name:"Das passt ins Bild",                       komps:["MI.1.3","MI.1.4"] },
+        { nr:"Kap. 5", name:"Daten, Daten, Daten",                      komps:["MI.1.1","MI.2.1"] },
+      ]},
+      { label:"Wahlangebot", kapitel:[
+        { nr:"+1", name:"<html> auf der Spur",                         komps:["MI.2.1","MI.2.3"] },
+        { nr:"+2", name:"Mit dem Zufall spielen",                      komps:["MI.2.2"] },
+        { nr:"+3", name:"Looks und Likes",                             komps:["MI.1.1","MI.1.2","MI.1.3","MI.1.4"] },
+        { nr:"+4", name:"Einfach unwiderstehlich!",                    komps:["MI.1.1","MI.1.2","MI.1.3","MI.1.4","MI.2.1"] },
+      ]}
+    ]
+  },
+  {
+    id:"c4", name:"connected 4", stufe:"8./9. Klasse", zyklen:["z3"],
+    beschreibung:"Lehrmittel Medien und Informatik für die 8./9. Klasse. Themen: Algorithmen, Fake News, Games, Datenschutz, Medienmündigkeit.",
+    verlag:"Lehrmittelverlag Zürich", link:"https://www.lmvz.ch/connected",
+    gruppen:[
+      { label:"Grundangebot", kapitel:[
+        { nr:"Kap. 1", name:"Wettbewerb der Algorithmen",  komps:["MI.1.1","MI.2.2"] },
+        { nr:"Kap. 2", name:"Fakes im Netz",               komps:["MI.1.1","MI.1.2","MI.1.3"] },
+        { nr:"Kap. 3", name:"Let's play",                  komps:["MI.1.2","MI.1.3"] },
+        { nr:"Kap. 4", name:"Sie wissen, wer du bist",     komps:["MI.1.2","MI.2.3"] },
+        { nr:"Kap. 5", name:"Survival Guide",              komps:["MI.1.1","MI.1.3","MI.1.4","MI.2.1","MI.2.3"] },
+      ]},
+      { label:"Wahlangebot", kapitel:[
+        { nr:"+1", name:"Kipp den Chip!",              komps:["MI.2.2"] },
+        { nr:"+2", name:"create {art}",                komps:["MI.2.2"] },
+        { nr:"+3", name:"Nichts ist, wie es scheint",  komps:["MI.1.1","MI.1.3"] },
+        { nr:"+4", name:"Filmfestival",                komps:["MI.1.2","MI.1.3","MI.1.4"] },
+      ]}
+    ]
+  }
+];
+
+/* ── LP RENDER ─────────────────────────────────────────────── */
+let activeFilter='all', openCards=new Set();
+function zyklenDots(z){return z.map(x=>`<div class="zd ${Z[x].dot}">${x.replace('z','')}</div>`).join('');}
+
+function renderLP(){
+  const c=document.getElementById('lp-content');let html='';
+  DATA.bereiche.forEach(b=>{
+    const vis=b.kompetenzen.filter(k=>activeFilter==='all'||k.zyklen.includes(activeFilter));
+    if(!vis.length)return;
+    html+=`<div class="bereich"><div class="bereich-header"><span class="bereich-code ${b.code}">${b.id}</span><span class="bereich-name">${b.name}</span></div>`;
+    if(b.hinweis)html+=`<div class="bereich-hint">ⓘ ${b.hinweis}</div>`;
+    html+=`<div class="k-grid">`;
+    vis.forEach(k=>{
+      const open=openCards.has(k.id);
+      html+=`<div class="kc ${k.zyklen.map(z=>`has-${z}`).join(' ')}${open?' open':''}" id="kc-${k.id}" onclick="toggleCard('${k.id}')"><div class="kc-head"><div class="kc-meta"><span class="kc-id">${k.id}</span><div class="kc-zyklen">${zyklenDots(k.zyklen)}</div></div><div class="kc-untertitel">${k.untertitel}</div><div class="kc-kompetenz">${k.kompetenz}</div><div class="kc-toggle">Kompetenzstufen anzeigen</div></div><div class="kc-detail">`;
+      k.stufen.forEach(s=>{
+        if(activeFilter!=='all'&&s.z!==activeFilter)return;
+        const zi=Z[s.z];
+        html+=`<div class="kc-zyklus-block ${zi.bg}"><div class="kz-label ${zi.cls}">${zi.label}</div>`;
+        s.items.forEach(i=>{html+=`<div class="ki-item"><span class="ki-key">${i.k}</span>${i.g?`<div class="ki-ga ${zi.ga}"></div>`:'<div style="width:7px;flex-shrink:0"></div>'}<span>${i.t}</span></div>`;});
+        html+=`</div>`;
+      });
+      html+=`</div></div>`;
+    });
+    html+=`</div></div>`;
+  });
+  const awk=DATA.anwendungskompetenzen;
+  const hasAny=awk.kategorien.some(k=>k.items.some(i=>activeFilter==='all'||i.zyklen.includes(activeFilter)));
+  if(hasAny){
+    html+=`<div class="bereich"><div class="bereich-header"><span class="bereich-code code-awk">Anwendung</span><span class="bereich-name">Anwendungskompetenzen</span></div><div style="font-size:12px;color:var(--text-2);margin-bottom:12px">Die Anwendungskompetenzen werden überwiegend integriert in den Fachbereichen unterrichtet.</div>`;
+    awk.kategorien.forEach(kat=>{
+      const vis=kat.items.filter(i=>activeFilter==='all'||i.zyklen.includes(activeFilter));
+      if(!vis.length)return;
+      html+=`<div class="awk-section"><div class="awk-kat">${kat.name}</div>`;
+      vis.forEach(i=>{html+=`<div class="awk-item ${i.zyklen.map(z=>`has-${z}`).join(' ')}"><div class="awk-zyklen">${zyklenDots(i.zyklen)}</div><div><div class="awk-text">${i.t}</div>${i.ref?`<div class="awk-ref">→ ${i.ref}</div>`:''}</div></div>`;});
+      html+=`</div>`;
+    });
+    html+=`</div>`;
+  }
+  c.innerHTML=html;
+}
+function toggleCard(id){if(openCards.has(id))openCards.delete(id);else openCards.add(id);document.getElementById('kc-'+id)?.classList.toggle('open');}
+function filter(f){activeFilter=f;['all','z1','z2','z3'].forEach(x=>{document.getElementById('f-'+x).className='fb'+(x===f?(x==='all'?' on-all':' on-'+x):'');});renderLP();}
+
+/* ── LEHRMITTEL RENDER ─────────────────────────────────────── */
+const ALL_KOMPS=[];
+DATA.bereiche.forEach(b=>b.kompetenzen.forEach(k=>ALL_KOMPS.push({id:k.id,titel:k.untertitel,bereich:b.name,zyklen:k.zyklen,stufen:k.stufen})));
+
+function kompTagCls(id){return id.startsWith('MI.1')?'kt-med':'kt-inf';}
+function countVolumes(kid){return LEHRMITTEL.filter(lm=>lm.gruppen.some(g=>g.kapitel.some(ch=>ch.komps.includes(kid)))).length;}
+
+let currentMode='a';
+
+function setMode(m){
+  currentMode=m;
+  ['a','b'].forEach(x=>{document.getElementById('mode-'+x).classList.toggle('on',x===m);});
+  document.getElementById('lm-result').innerHTML=`<div class="lm-empty"><div class="lm-empty-icon">${m==='a'?'◈':'⊞'}</div><p>${m==='a'?'Wähle links eine Kompetenz, um passende Kapitel zu sehen.':'Wähle links ein Kapitel, um die enthaltenen Kompetenzen zu sehen.'}</p></div>`;
+  renderSidebar();
+}
+
+function renderSidebar(){
+  const sb=document.getElementById('lm-sidebar');
+  let html=`<div class="lm-sidebar-title">${currentMode==='a'?'Kompetenz wählen':'Kapitel wählen'}</div>`;
+
+  if(currentMode==='a'){
+    ['MI.1','MI.2'].forEach(prefix=>{
+      const isMed=prefix==='MI.1';
+      html+=`<div class="lm-bereich-group"><div class="lm-bereich-lbl ${isMed?'lb-med':'lb-inf'}">${prefix} ${isMed?'Medien':'Informatik'}</div>`;
+      ALL_KOMPS.filter(k=>k.id.startsWith(prefix)).forEach(k=>{
+        const n=countVolumes(k.id);
+        html+=`<button class="lm-k-btn" id="lmbtn-${k.id}" onclick="selectKomp('${k.id}')"><span class="lm-k-id">${k.id}</span><span class="lm-k-name">${k.titel}</span><span class="lm-k-count">${n}</span></button>`;
+      });
+      html+=`</div>`;
+      if(isMed)html+=`<div class="lm-divider"></div>`;
+    });
+  } else {
+    LEHRMITTEL.forEach(lm=>{
+      const isMed=lm.zyklen.includes('z2');
+      html+=`<div class="lm-book-group"><div class="lm-book-name ${isMed?'book-z2':'book-z3'}">${lm.name} <span style="font-weight:400;opacity:.7">· ${lm.stufe}</span></div>`;
+      lm.gruppen.forEach(g=>{
+        html+=`<div class="lm-book-sub">${g.label}</div>`;
+        g.kapitel.forEach(ch=>{
+          const chId=`${lm.id}__${ch.nr}`;
+          html+=`<button class="lm-ch-btn" id="chbtn-${chId}" onclick="selectKapitel('${lm.id}','${ch.nr}')"><span class="lm-ch-btn-nr">${ch.nr}</span><span>${ch.name}</span></button>`;
+        });
+      });
+      html+=`</div><div class="lm-divider"></div>`;
+    });
+  }
+  sb.innerHTML=html;
+}
+
+/* Mode A: Kompetenz → Kapitel */
+function selectKomp(kid){
+  document.querySelectorAll('.lm-k-btn').forEach(b=>b.classList.remove('sel'));
+  document.getElementById('lmbtn-'+kid)?.classList.add('sel');
+  const komp=ALL_KOMPS.find(k=>k.id===kid);
+  const matching=LEHRMITTEL.filter(lm=>lm.gruppen.some(g=>g.kapitel.some(ch=>ch.komps.includes(kid))));
+  const res=document.getElementById('lm-result');
+  let html=`<div class="lm-result-header">
+    <div class="lm-result-title">
+      <h2>${kid} – ${komp?.titel||''}</h2>
+      <p>${komp?.bereich||''} · ${komp?.zyklen.map(z=>Z[z].short).join(', ')}</p>
+    </div>
+    <span class="lm-count">${matching.length} Lehrmittel</span>
+  </div>`;
+  if(!matching.length){
+    html+=`<div class="lm-none">Für diese Kompetenz sind noch keine Lehrmittel hinterlegt.</div>`;
+  } else {
+    matching.forEach(lm=>{
+      const zyBadge=lm.zyklen.map(z=>`<span class="lm-stufe-badge badge-${z}">${Z[z].short} · ${lm.stufe}</span>`).join('');
+      html+=`<div class="lm-card">
+        <div class="lm-card-top">
+          <div class="lm-card-header">
+            <div><div class="lm-card-name">${lm.name}</div><div class="lm-card-meta" style="margin-top:5px">${zyBadge}</div></div>
+            <div class="lm-card-zyklen">${zyklenDots(lm.zyklen)}</div>
+          </div>
+          <div class="lm-card-desc" style="margin-top:8px">${lm.beschreibung}</div>
+          <div class="lm-card-link"><a href="${lm.link}" target="_blank">↗ ${lm.verlag}</a></div>
+        </div>
+        <div class="lm-chapters">`;
+      lm.gruppen.forEach(g=>{
+        const anyMatch=g.kapitel.some(ch=>ch.komps.includes(kid));
+        if(!anyMatch)return;
+        html+=`<div class="lm-ch-group"><div class="lm-ch-group-label">${g.label}</div>`;
+        g.kapitel.forEach(ch=>{
+          const isMatch=ch.komps.includes(kid);
+          html+=`<div class="lm-ch-item${isMatch?' highlight':''}">
+            <span class="lm-ch-num">${ch.nr}</span>
+            <span class="lm-ch-name">${ch.name}</span>
+            <div class="lm-ch-komps">${ch.komps.map(k=>`<span class="komp-tag ${k===kid?'kt-sel':kompTagCls(k)}">${k}</span>`).join('')}</div>
+          </div>`;
+        });
+        html+=`</div>`;
+      });
+      html+=`</div></div>`;
+    });
+  }
+  res.innerHTML=html;
+}
+
+/* Mode B: Kapitel → Kompetenzen */
+function selectKapitel(lmId, chNr){
+  document.querySelectorAll('.lm-ch-btn').forEach(b=>b.classList.remove('sel'));
+  document.getElementById(`chbtn-${lmId}__${chNr}`)?.classList.add('sel');
+  const lm=LEHRMITTEL.find(x=>x.id===lmId);
+  let chapter=null, groupLabel='';
+  lm.gruppen.forEach(g=>g.kapitel.forEach(ch=>{if(ch.nr===chNr){chapter=ch;groupLabel=g.label;}}));
+  if(!chapter)return;
+
+  const res=document.getElementById('lm-result');
+  const zyBadge=lm.zyklen.map(z=>`<span class="lm-stufe-badge badge-${z}">${Z[z].short} · ${lm.stufe}</span>`).join('');
+  let html=`<div style="margin-bottom:1.25rem">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+      <div>
+        <div style="font-size:11px;color:var(--text-3);font-weight:600;margin-bottom:4px">${lm.name} · ${groupLabel}</div>
+        <div class="lm-chapter-title">${chapter.nr} – ${chapter.name}</div>
+        <div class="lm-chapter-meta">${zyBadge}</div>
+      </div>
+      <div class="lm-card-zyklen">${zyklenDots(lm.zyklen)}</div>
+    </div>
+    <div class="lm-k-count-info">${chapter.komps.length} Kompetenz${chapter.komps.length!==1?'en':''} in diesem Kapitel</div>
+  </div>`;
+
+  chapter.komps.forEach(kid=>{
+    const komp=ALL_KOMPS.find(k=>k.id===kid);
+    if(!komp)return;
+    const isMed=kid.startsWith('MI.1');
+    const relevantStufen=komp.stufen.filter(s=>lm.zyklen.includes(s.z));
+    html+=`<div class="komp-detail-card">
+      <div class="kdc-head">
+        <span class="kdc-badge ${isMed?'kt-med':'kt-inf'}">${kid}</span>
+        <div class="kdc-body">
+          <div class="kdc-titel">${komp.titel}</div>
+          <div class="kdc-kompetenz">${komp.stufen[0]?.items[0]?.t ? komp.id : komp.titel}</div>
+        </div>
+      </div>`;
+    if(relevantStufen.length){
+      html+=`<div class="kdc-stufen">`;
+      relevantStufen.forEach(s=>{
+        const zi=Z[s.z];
+        html+=`<div class="kdc-stufe">
+          <span class="kdc-z-pill pill-${s.z}">${zi.label}</span>
+          <div class="kdc-stufe-items">`;
+        s.items.forEach(i=>{
+          html+=`<div class="kdc-item-row"><span class="kdc-key">${i.k}</span>${i.g?`<div class="kdc-ga ${zi.ga}"></div>`:'<div style="width:7px;flex-shrink:0"></div>'}<span>${i.t}</span></div>`;
+        });
+        html+=`</div></div>`;
+      });
+      html+=`</div>`;
+    }
+    html+=`</div>`;
+  });
+  res.innerHTML=html;
+}
+
+function show(p){
+  ['lp','lm'].forEach(x=>{document.getElementById('pg-'+x).classList.toggle('on',x===p);document.getElementById('tab-'+x).classList.toggle('on',x===p);});
+}
+renderLP();
+renderSidebar();
+</script>
+</body>
+</html>
